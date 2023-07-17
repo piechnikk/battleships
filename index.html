@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #statki>div>div {
+            border: 1px black solid;
+            display: inline-block;
+        }
+
+        #statki>div {
+            margin-top: 5px;
+        }
+
+        #statki>div:hover {
+            background-color: red;
+        }
+
+        #main div {
+            position: absolute;
+            border: 1px black solid;
+            box-sizing: border-box;
+        }
+
+        #main {
+            position: absolute;
+            top: 50px;
+            left: 150px;
+        }
+
+        #computer>div {
+            position: absolute;
+            border: 1px black solid;
+            box-sizing: border-box;
+        }
+
+        #computer {
+            position: absolute;
+            top: 50px;
+            left: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="statki"></div>
+    <div id="main"></div>
+    <div id="computer"></div>
+    <script>
+        //ustawienia
+        const ilePol = 8
+        const rozmPola = 30
+        const statki = [4, 3, 3, 2, 2, 2, 1, 1, 1, 1]
+        gra()
+
+        function gra() {
+            //funkcja do losowania statków przez komputer
+            function losowanie(dlugosc) {
+                do {
+                    //jeżeli sprawdzanie jest true to znaczy że podczas losowania wystąpiła kolizja z innym statkiem (już ustawionym)
+                    var sprawdzanie = false
+                    //losowanie kierunku oraz pozycji ustawienia statków
+                    var poza = Math.floor(Math.random() * 2)
+                    var x = Math.ceil(Math.random() * ((ilePol + 1) - dlugosc))
+                    var y = Math.ceil(Math.random() * ((ilePol + 1) - dlugosc))
+
+                    //sprawdzanie czy nie nachodzą i czy sie nie stykają
+                    if (poza == 0) { //poziomo
+                        for (var i = 0; i < dlugosc + 2; i++) {
+                            if (statkiKomp[y - 1][x + i - 1] != 0 || statkiKomp[y][x + i - 1] != 0 || statkiKomp[y + 1][x + i - 1] != 0) {
+                                sprawdzanie = true
+                            }
+                        }
+                    } else if (poza == 1) { //pionowo
+                        for (var i = 0; i < dlugosc + 2; i++) {
+                            if (statkiKomp[y + i - 1][x - 1] != 0 || statkiKomp[y + i - 1][x] != 0 || statkiKomp[y + i - 1][x + 1] != 0) {
+                                sprawdzanie = true
+                            }
+                        }
+                    }
+
+                } while (sprawdzanie)
+
+                //dodawanie wylosowanych statków do tablicy (statkiKomp) na wylosowanych mejscach
+                if (poza == 0) { //poziomo
+                    for (var i = 0; i < dlugosc; i++) statkiKomp[y][x + i] += 1
+                } else if (poza == 1) { //pionowo
+                    for (var i = 0; i < dlugosc; i++) statkiKomp[y + i][x] += 1
+                }
+            }
+
+            //tworzenie tablic z zerami
+            var statkiKomp = []
+            var statkiGracz = []
+            for (var y = 0; y < ilePol + 2; y++) {
+                statkiKomp.push([])
+                statkiGracz.push([])
+                for (var x = 0; x < ilePol + 2; x++) {
+                    statkiKomp[y].push(0)
+                    statkiGracz[y].push(0)
+                }
+            }
+
+            //losowanie statków komputera
+            for (var i = 0; i < statki.length; i++) {
+                losowanie(statki[i])
+            }
+
+            //wyświetlanie statków komputera
+            for (var y = 1; y <= ilePol; y++) {
+                for (var x = 1; x <= ilePol; x++) {
+
+                    var newDiv = document.createElement("div")
+
+                    newDiv.style.top = rozmPola * y + "px"
+                    newDiv.style.left = rozmPola * x + "px"
+                    newDiv.style.width = rozmPola + "px"
+                    newDiv.style.height = rozmPola + "px"
+                    newDiv.style.display = "flex"
+                    newDiv.style.alignItems = "center"
+                    newDiv.style.justifyContent = "center"
+                    newDiv.style.fontSize = rozmPola + "px"
+
+
+                    newDiv.id = x + "k" + y
+                    var rozgrywka = false
+                    var statGracza = 1
+                    var statKomputra = 1
+                    var statkiKomp1 = statkiKomp
+                    var statkiGracz1 = statkiGracz
+                    var kolejGracza = true
+                    var alertGracz = false
+
+                    newDiv.addEventListener("click", function () {
+                        if (rozgrywka) {
+                            if (statGracza != 0 || statKomputra != 0) {
+                                if (alertGracz) {
+                                    window.alert("Ruch komputera!")
+                                } else {
+                                    if (kolejGracza) {
+                                        var xy = this.id.split("k")
+                                        if (this.innerText == "") {
+                                            if (statkiKomp1[xy[1]][xy[0]] == 1) {
+                                                this.innerText = "✖"
+                                                statkiKomp1[xy[1]][xy[0]] = 0
+                                                kolejGracza = true
+                                                setTimeout(function () {
+                                                    statKomputra = 0
+                                                    for (var yy = 0; yy < ilePol + 2; yy++) {
+                                                        for (var xx = 0; xx < ilePol + 2; xx++) {
+                                                            if (statkiKomp1[yy][xx] == 1) statKomputra++
+                                                        }
+                                                    }
+
+                                                    if (statKomputra == 0) {
+                                                        window.alert("Brawo wygrałeś. Kliknij OK w celu rewanżu")
+                                                        rozgrywka = false
+                                                        document.getElementById("main").remove()
+                                                        document.getElementById("computer").remove()
+                                                        document.body.innerHTML += '<div id="main"></div> <div id="computer"></div>'
+                                                        gra()
+                                                    }
+                                                }, 10)
+                                            } else {
+                                                this.innerText = "•"
+                                                kolejGracza = false
+                                            }
+                                        }
+                                    }
+                                    if (!kolejGracza) {
+
+                                        do {
+                                            var sprawdzanie = false
+                                            var x = Math.ceil(Math.random() * ((ilePol)))
+                                            var y = Math.ceil(Math.random() * ((ilePol)))
+                                            var divP = document.getElementById(x + "p" + y)
+                                            if (divP.innerText != "") sprawdzanie = true
+                                            else {
+
+                                                alertGracz = true
+                                                var myslenie = setInterval(function () {
+
+                                                    if (statkiGracz1[y][x] == 1) {
+                                                        divP.innerText = "✖"
+                                                        statkiGracz1[y][x] = 0
+                                                        sprawdzanie = true
+
+                                                        do {
+                                                            var spr = false
+                                                            x = Math.ceil(Math.random() * ((ilePol)))
+                                                            y = Math.ceil(Math.random() * ((ilePol)))
+                                                            divP = document.getElementById(x + "p" + y)
+                                                            if (divP.innerText != "") spr = true
+                                                        } while (spr)
+
+                                                        statGracza = 0
+                                                        for (var yy = 0; yy < ilePol + 2; yy++) {
+                                                            for (var xx = 0; xx < ilePol + 2; xx++) {
+                                                                if (statkiGracz1[yy][xx] == 1) statGracza++
+                                                            }
+                                                        }
+                                                        setTimeout(function () {
+                                                            if (statGracza == 0) {
+                                                                window.alert("Komputer wygrał za 5 sekund masz szanse się zrewanżować")
+                                                                rozgrywka = false
+                                                                for (var yy = 0; yy < ilePol + 2; yy++) {
+                                                                    for (var xx = 0; xx < ilePol + 2; xx++) {
+                                                                        if (statkiKomp[yy][xx] == 1) document.getElementById(xx + "k" + yy).style.backgroundColor = "red"
+                                                                    }
+                                                                }
+
+                                                                setTimeout(function () {
+                                                                    document.getElementById("main").remove()
+                                                                    document.getElementById("computer").remove()
+                                                                    document.body.innerHTML += '<div id="main"></div> <div id="computer"></div>'
+                                                                    gra()
+                                                                }, 5000)
+                                                            }
+                                                        }, 10)
+
+                                                    } else {
+                                                        divP.innerText = "•"
+                                                        clearInterval(myslenie)
+                                                        kolejGracza = true
+                                                        alertGracz = false
+                                                    }
+                                                }, 1000)
+                                            }
+                                        } while (sprawdzanie)
+
+                                    }
+                                }
+                            }
+
+
+
+                        }
+                    })
+
+                    //kolorowanie statków komputera w oparciu o tablicę (jeśli chcemy widzieć statki przeciwnika)
+                    // if (statkiKomp[y][x] == 1) {
+                    //     newDiv.style.backgroundColor = "gray"
+                    // }
+
+                    var div = document.querySelector("#computer")
+                    div.appendChild(newDiv)
+                }
+            }
+
+            //wybieranie statków (generowanie statków z boku)
+            var rozWybranego = 0
+            var idWybranego = 0
+            var powstaly = false
+            //tworzenie "statków" (większych divów w których będą mniejsze)
+            for (var i = 0; i < statki.length; i++) {
+                var parentDiv = document.createElement("div")
+                var div = document.querySelector("#statki")
+
+                //w większych divach tworzą się mniejsze (w statku czwórce 4 divy)
+                for (var x = 0; x < statki[i]; x++) {
+
+                    var newDiv = document.createElement("div")
+                    newDiv.style.width = rozmPola + "px"
+                    newDiv.style.height = rozmPola + "px"
+                    parentDiv.appendChild(newDiv)
+                }
+                parentDiv.style.height = (rozmPola + 2) + "px"
+                parentDiv.style.width = (rozmPola + 2) * statki[i] + "px"
+                parentDiv.id = "s" + i
+
+                //przy kliknięciu poprzednio zaznaczony div zmienia kolor na "" a kliknięty na niebieski
+                parentDiv.addEventListener("click", function () {
+                    rozWybranego = this.style.width.slice(0, -2) / (rozmPola + 2)
+                    idWybranego = this.id
+                    wybranyStatek.style.backgroundColor = ""
+                    wybranyStatek = this
+                    wybranyStatek.style.backgroundColor = "blue"
+                })
+                div.appendChild(parentDiv)
+                if (i + 1 == statki.length) powstaly = true
+            }
+
+            //wybranie pierwszego statku (pobieram jego rozmiar i id)
+            var wybranyStatek = ""
+            if (powstaly) {
+                var pierwszyStatek = document.getElementById("s0")
+                rozWybranego = pierwszyStatek.style.width.slice(0, -2) / (rozmPola + 2)
+                idWybranego = pierwszyStatek.id
+                pierwszyStatek.style.backgroundColor = "blue"
+                wybranyStatek = pierwszyStatek
+            }
+
+
+            //generowanie pola i stawianie statków
+            for (var y = 1; y <= ilePol; y++) {
+                for (var x = 1; x <= ilePol; x++) {
+
+                    var newDiv = document.createElement("div")
+
+                    newDiv.style.top = rozmPola * y + "px"
+                    newDiv.style.left = rozmPola * x + "px"
+                    newDiv.style.width = rozmPola + "px"
+                    newDiv.style.height = rozmPola + "px"
+                    newDiv.style.display = "flex"
+                    newDiv.style.alignItems = "center"
+                    newDiv.style.justifyContent = "center"
+                    newDiv.style.fontSize = rozmPola + "px"
+
+                    newDiv.id = x + "p" + y
+
+                    //w tablicy klik zapisuję id wszystkich divów które są kliknięte (zaznaczone)
+                    var klik = []
+                    newDiv.addEventListener("click", function () {
+                        var sprawdzanie = false
+                        var xy = this.id.split("p")
+                        //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                        if (xy[kierunek] > ilePol - rozWybranego + 1) xy[kierunek] -= rozWybranego - (ilePol - xy[kierunek]) - 1
+                        //sprawdzanie czy można postawić statek (czy nie nachodzi albo nie styka się z innym)
+                        if (kierunek == 0) { //poziomo
+                            for (var i = 0; i < rozWybranego + 2; i++) {
+                                if (statkiGracz[parseInt(xy[okierunek]) - 1][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek])][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek]) + 1][parseInt(xy[kierunek]) + i - 1] != 0) {
+                                    sprawdzanie = true
+                                }
+                            }
+                        } else if (kierunek == 1) { //pionowo
+                            for (var i = 0; i < rozWybranego + 2; i++) {
+                                if (statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) - 1] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek])] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) + 1] != 0) {
+                                    sprawdzanie = true
+                                }
+                            }
+                        }
+                        //jeżeli nie styka się z innym to robi to co jest pod spodem
+                        if (!sprawdzanie) {
+                            var xy = this.id.split("p")
+                            //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                            if (xy[kierunek] > ilePol - rozWybranego + 1) xy[kierunek] -= rozWybranego - (ilePol - xy[kierunek]) - 1
+                            xy[kierunek] -= 1
+                            for (var i = 0; i < rozWybranego; i++) {
+                                xy[kierunek] += 1
+                                //dodawanie do tablicy ze statkami gracza gdzi są ustawione
+                                if (kierunek == 0) {
+                                    statkiGracz[xy[okierunek]][xy[kierunek]] += 1
+                                    //resetowanie obrócenia
+                                } else if (kierunek == 1) {
+                                    statkiGracz[xy[kierunek]][xy[okierunek]] += 1
+                                }
+                                //kolorowanie na niebiesko
+                                var idDiv = xy.join("p")
+                                var divKolor = document.getElementById(idDiv)
+                                divKolor.style.backgroundColor = "blue"
+                                //dodawanie do tablicy o jakim id statki są kliknięte (pokolorowane) 
+                                klik.push(idDiv)
+                            }
+                            //resetowanie obrócenia
+                            if (kierunek == 1) {
+                                kierunek = 0
+                                okierunek = 1
+                            }
+                            //usunięcie postawionego statku z boku
+                            document.getElementById(idWybranego).remove();
+                            rozWybranego = 0
+
+                            //wyświetlanie przycisku do startu
+                            if (document.getElementById("statki").children.length == 0) {
+                                var startButton = document.createElement("button")
+                                startButton.style.width = rozmPola * ilePol + "px"
+                                startButton.style.height = rozmPola + "px"
+                                startButton.innerText = "ROZPOCZNIJ ROZGRYWKĘ"
+                                startButton.id = "start"
+
+                                //guzik start, po kliknięciu znika
+                                startButton.addEventListener("click", function () {
+                                    rozgrywka = true
+                                    var poleGracza = document.getElementById("main")
+                                    poleGracza.addEventListener("click", function () {
+                                        if (rozgrywka) {
+                                            if (alertGracz)
+                                                window.alert("Ruch komputera!")
+                                            else
+                                                window.alert("Ruch gracza!")
+                                        }
+                                    })
+                                    document.getElementById("startDiv").remove()
+                                })
+
+                                var startDiv = document.createElement("div")
+                                var mainTop = parseInt(window.getComputedStyle(document.getElementById("main")).getPropertyValue('top').slice(0, -2))
+                                startDiv.style.top = mainTop + rozmPola * (ilePol + 2) + "px"
+                                var mainLeft = parseInt(window.getComputedStyle(document.getElementById("main")).getPropertyValue('left').slice(0, -2))
+                                startDiv.style.left = mainLeft + rozmPola + "px"
+                                startDiv.style.position = "absolute"
+                                startDiv.id = "startDiv"
+                                startDiv.appendChild(startButton)
+                                document.body.appendChild(startDiv)
+                            }
+                        }
+                    })
+
+                    newDiv.addEventListener("mouseover", function () {
+                        var sprawdzanie = false
+                        var xy = this.id.split("p")
+                        //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                        if (xy[kierunek] > ilePol - rozWybranego + 1) xy[kierunek] -= rozWybranego - (ilePol - xy[kierunek]) - 1
+                        //sprawdzanie czy można postawić statek (czy nie nachodzi albo nie styka się z innym)
+                        if (kierunek == 0) { //poziomo
+                            for (var i = 0; i < rozWybranego + 2; i++) {
+                                if (statkiGracz[parseInt(xy[okierunek]) - 1][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek])][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek]) + 1][parseInt(xy[kierunek]) + i - 1] != 0) {
+                                    sprawdzanie = true
+                                }
+                            }
+                        } else if (kierunek == 1) { //pionowo
+                            for (var i = 0; i < rozWybranego + 2; i++) {
+                                if (statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) - 1] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek])] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) + 1] != 0) {
+                                    sprawdzanie = true
+                                }
+                            }
+                        }
+                        //jeżeli styka się to koloruje na czerwono
+                        if (sprawdzanie) {
+                            xy[kierunek] -= 1
+                            for (var i = 0; i < rozWybranego; i++) {
+                                xy[kierunek] += 1
+                                var idDiv = xy.join("p")
+                                var divKolor = document.getElementById(idDiv)
+                                divKolor.style.backgroundColor = "red"
+                            }
+                        }
+                        //jeżeli nie styka się to koloruje na zielono
+                        else {
+                            xy[kierunek] -= 1
+                            for (var i = 0; i < rozWybranego; i++) {
+                                xy[kierunek] += 1
+                                var idDiv = xy.join("p")
+                                var divKolor = document.getElementById(idDiv)
+                                divKolor.style.backgroundColor = "green"
+                            }
+                        }
+                        thisDiv = this
+                    })
+
+                    newDiv.addEventListener("mouseout", function () {
+                        var xy = this.id.split("p")
+                        //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                        if (xy[kierunek] > ilePol - rozWybranego + 1) xy[kierunek] -= rozWybranego - (ilePol - xy[kierunek]) - 1
+                        xy[kierunek] -= 1
+                        //usuwanie z niego koloru
+                        for (var i = 0; i < rozWybranego; i++) {
+                            xy[kierunek] += 1
+                            var idDiv = xy.join("p")
+                            var divKolor = document.getElementById(idDiv)
+                            divKolor.style.backgroundColor = ""
+                        }
+                        //kolorowanie już wybranych statków na niebiesko
+                        for (var i = 0; i < klik.length; i++) {
+                            var klikDiv = document.getElementById(klik[i])
+                            klikDiv.style.backgroundColor = "blue"
+                        }
+                    })
+
+                    var div = document.querySelector("#main")
+                    div.appendChild(newDiv)
+                }
+            }
+
+            //zmiana kierunku
+            var kierunek = 0
+            var okierunek = 1
+            document.getElementById("main").addEventListener("contextmenu", function (event) {
+                event.preventDefault()
+                if (kierunek == 0) {
+                    kierunek = 1
+                    okierunek = 0
+                }
+                else {
+                    kierunek = 0
+                    okierunek = 1
+                }
+
+                var xy = thisDiv.id.split("p")
+                //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                if (xy[okierunek] > ilePol - rozWybranego + 1) xy[okierunek] -= rozWybranego - (ilePol - xy[okierunek]) - 1
+                xy[okierunek] -= 1
+                //usuwanie z niego koloru
+                for (var i = 0; i < rozWybranego; i++) {
+                    xy[okierunek] += 1
+                    var idDiv = xy.join("p")
+                    var divKolor = document.getElementById(idDiv)
+                    divKolor.style.backgroundColor = ""
+                }
+                //kolorowanie już wybranych statków na niebiesko
+                for (var i = 0; i < klik.length; i++) {
+                    var klikDiv = document.getElementById(klik[i])
+                    klikDiv.style.backgroundColor = "blue"
+                }
+
+
+                var sprawdzanie = false
+                var xy = thisDiv.id.split("p")
+                //jeżeli statek nie mieści się na planszy (przy dosuwaniu do krawędzi) to kolorują się o tyle wcześniejsze divy o ile się nie mieści
+                if (xy[kierunek] > ilePol - rozWybranego + 1) xy[kierunek] -= rozWybranego - (ilePol - xy[kierunek]) - 1
+                //sprawdzanie czy można postawić statek (czy nie nachodzi albo nie styka się z innym)
+                if (kierunek == 0) { //poziomo
+                    for (var i = 0; i < rozWybranego + 2; i++) {
+                        if (statkiGracz[parseInt(xy[okierunek]) - 1][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek])][parseInt(xy[kierunek]) + i - 1] != 0 || statkiGracz[parseInt(xy[okierunek]) + 1][parseInt(xy[kierunek]) + i - 1] != 0) {
+                            sprawdzanie = true
+                        }
+                    }
+                } else if (kierunek == 1) { //pionowo
+                    for (var i = 0; i < rozWybranego + 2; i++) {
+                        if (statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) - 1] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek])] != 0 || statkiGracz[parseInt(xy[kierunek]) + i - 1][parseInt(xy[okierunek]) + 1] != 0) {
+                            sprawdzanie = true
+                        }
+                    }
+                }
+
+                //jeżeli styka się to koloruje na czerwono
+                if (sprawdzanie) {
+                    xy[kierunek] -= 1
+                    for (var i = 0; i < rozWybranego; i++) {
+                        xy[kierunek] += 1
+                        var idDiv = xy.join("p")
+                        var divKolor = document.getElementById(idDiv)
+                        divKolor.style.backgroundColor = "red"
+                    }
+                }
+                //jeżeli nie styka się to koloruje na zielono
+                else {
+                    xy[kierunek] -= 1
+                    for (var i = 0; i < rozWybranego; i++) {
+                        xy[kierunek] += 1
+                        var idDiv = xy.join("p")
+                        var divKolor = document.getElementById(idDiv)
+                        divKolor.style.backgroundColor = "green"
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
