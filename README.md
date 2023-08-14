@@ -6,9 +6,9 @@ This is a simple battleships game against computer built using HTML, CSS, JavaSc
   <summary>Table of Contents</summary>
   <ul>
     <li><a href="#live-demo">Live Demo</a></li>
-    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#setup">Setup</a></li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#build-with">Build With</a></li>
+    <li><a href="#technologies">Technologies</a></li>
   </ul>
 </details>
 
@@ -16,7 +16,7 @@ This is a simple battleships game against computer built using HTML, CSS, JavaSc
 
 Explore the [live demo](https://piechnikk.github.io/battleships/) of the battleships website.
 
-## Getting Started
+## Setup
 
 To get a copy of this project up and running on your local machine, follow these steps:
 
@@ -44,12 +44,12 @@ Open the `index.html` file in your preferred web browser to view the website. Pl
 
 
 
-## Build With
+## Technologies
 
 <div>
     <img src="https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"> 
     <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3">
-    <img src="https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E alt="JavaScript">  
+    <img src="https://img.shields.io/badge/JavaScript-323330?style=for-the-badge&logo=javascript&logoColor=F7DF1E" alt="JavaScript">  
 </div>
 
 ---
